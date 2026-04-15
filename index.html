@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Empath — Emotionally Aware Learning</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        :root {
+            --mc: #4ade80;
+            --mg: rgba(74, 222, 128, .08);
+            --ms: rgba(74, 222, 128, .3)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            background: #0a0a0f;
+            color: #e8e8f0;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: all .8s
+        }
+
+        .grid {
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .018) 1px, transparent 1px);
+            background-size: 56px 56px;
+            z-index: 0;
+            pointer-events: none
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .13;
+            z-index: 0;
+            pointer-events: none;
+            background: var(--mc);
+            transition: background 1s
+        }
+
+        .o1 {
+            width: 560px;
+            height: 560px;
+            top: -180px;
+            right: -80px
+        }
+
+        .o2 {
+            width: 380px;
+            height: 380px;
+            bottom: -80px;
+            left: -80px;
+            animation: drift 8s ease-in-out infinite
+        }
+
+        @keyframes drift {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-36px)
+            }
+        }
+
+        .app {
+            position: relative;
+            z-index: 1
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 40px 20px;
+            animation: fi .45s ease
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px
+        }
+
+        @keyframes fi {
+            from {
+                opacity: 0;
+                transform: translateY(18px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.4rem, 6vw, 4.2rem);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -.02em;
+            text-align: center
+        }
+
+        h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.4rem, 3vw, 2.1rem);
+            font-weight: 700;
+            text-align: center
+        }
+
+        .gt {
+            background: linear-gradient(135deg, var(--mc), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: .95rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--mc);
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .ld {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--mc);
+            animation: pulse 2s ease-in-out infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .5;
+                transform: scale(.8)
+            }
+        }
+
+        .btn {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .88rem;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            padding: 13px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .bp {
+            background: var(--mc);
+            color: #000;
+            box-shadow: 0 0 28px var(--ms)
+        }
+
+        .bp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 48px var(--ms)
+        }
+
+        .bg {
+            background: transparent;
+            color: #6b6b80;
+            border: 1px solid rgba(255, 255, 255, .08)
+        }
+
+        .bg:hover {
+            border-color: var(--mc);
+            color: var(--mc)
+        }
+
+        .bs {
+            padding: 10px 20px;
+            font-size: .78rem
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: #0a1a0f;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .88rem;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            padding: 13px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 28px rgba(56, 239, 125, .4)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 999px;
+            font-size: .78rem;
+            color: #6b6b80;
+            letter-spacing: .05em;
+            text-transform: uppercase
+        }
+
+        .badge span {
+            color: var(--mc)
+        }
+
+        .sub {
+            color: #6b6b80;
+            font-size: 1.05rem;
+            max-width: 480px;
+            line-height: 1.72;
+            text-align: center
+        }
+
+        .tag {
+            font-family: 'Syne', sans-serif;
+            font-size: .72rem;
+            font-weight: 800;
+            color: var(--mc);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: .4rem
+        }
+
+        /* MODE CARDS */
+        .mopts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            max-width: 680px;
+            width: 100%
+        }
+
+        .mopt {
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 18px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all .3s;
+            text-align: center
+        }
+
+        .mopt:hover {
+            border-color: rgba(255, 255, 255, .2);
+            transform: translateY(-4px)
+        }
+
+        .mopt-ic {
+            font-size: 2.8rem;
+            margin-bottom: 14px
+        }
+
+        .mopt h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 8px
+        }
+
+        .mopt p {
+            color: #6b6b80;
+            font-size: .84rem;
+            line-height: 1.6
+        }
+
+        /* STUDY MODE CARDS */
+        .study-modes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            max-width: 600px;
+            width: 100%
+        }
+
+        .study-mode-card {
+            background: #111118;
+            border: 2px solid rgba(255, 255, 255, .08);
+            border-radius: 18px;
+            padding: 28px 22px;
+            cursor: pointer;
+            transition: all .35s cubic-bezier(.34, 1.56, .64, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            min-height: 155px
+        }
+
+        .smc-revenge {
+            border-color: rgba(248, 113, 113, .2)
+        }
+
+        .smc-revenge:hover {
+            border-color: #f87171;
+            box-shadow: 0 0 30px rgba(248, 113, 113, .25);
+            transform: translateY(-4px);
+            animation: shake .4s ease
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateY(-4px) rotate(0)
+            }
+
+            25% {
+                transform: translateY(-4px) rotate(-1.2deg)
+            }
+
+            75% {
+                transform: translateY(-4px) rotate(1.2deg)
+            }
+        }
+
+        .smc-lazy {
+            border-color: rgba(251, 146, 60, .2)
+        }
+
+        .smc-lazy:hover {
+            border-color: #fb923c;
+            box-shadow: 0 0 30px rgba(251, 146, 60, .25);
+            transform: translateY(-4px)
+        }
+
+        .smc-stress {
+            border-color: rgba(250, 204, 21, .2)
+        }
+
+        .smc-stress:hover {
+            border-color: #facc15;
+            box-shadow: 0 0 30px rgba(250, 204, 21, .25);
+            transform: translateY(-4px)
+        }
+
+        .smc-happy {
+            border-color: rgba(74, 222, 128, .2)
+        }
+
+        .smc-happy:hover {
+            border-color: #4ade80;
+            box-shadow: 0 0 30px rgba(74, 222, 128, .25);
+            transform: translateY(-4px)
+        }
+
+        .smc-icon {
+            font-size: 2.4rem;
+            display: block;
+            margin-bottom: 8px
+        }
+
+        .smc-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .smc-desc {
+            font-size: .82rem;
+            color: #6b6b80;
+            line-height: 1.5
+        }
+
+        .sparkle-badge {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            font-size: 1.1rem
+        }
+
+        .text-red {
+            color: #f87171
+        }
+
+        .text-yellow {
+            color: #facc15
+        }
+
+        .text-accent {
+            color: #fb923c
+        }
+
+        .text-green {
+            color: #4ade80
+        }
+
+        /* EMOJI */
+        .emoji-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap
+        }
+
+        .emoji-btn {
+            font-size: 2.4rem;
+            background: #111118;
+            border: 2px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all .25s;
+            line-height: 1
+        }
+
+        .emoji-btn:hover {
+            transform: translateY(-4px) scale(1.15);
+            border-color: var(--mc);
+            box-shadow: 0 0 22px var(--ms)
+        }
+
+        .emoji-btn.selected {
+            transform: scale(1.3);
+            border-color: var(--mc);
+            box-shadow: 0 0 28px var(--ms)
+        }
+
+        .emoji-btn.faded {
+            opacity: .3;
+            transform: scale(.9)
+        }
+
+        /* WEBCAM — rectangular scanner box */
+        .wbox {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 0 50px var(--mg);
+            transition: box-shadow .4s;
+        }
+        #cam-video-el {
+            width: 480px;
+            max-width: 90vw;
+            height: 340px;
+            object-fit: cover;
+            display: block;
+            transform: scaleX(-1);
+        }
+        .cam-placeholder {
+            width: 480px;
+            max-width: 90vw;
+            height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            background: #111118;
+        }
+        .wov {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 18px;
+            background: linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 55%);
+            pointer-events: none;
+        }
+        .wst {
+            font-family: 'Syne', sans-serif;
+            font-size: .78rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--mc);
+        }
+        .sbar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg,transparent,var(--mc),transparent);
+            animation: scan-sweep 2.2s ease-in-out infinite;
+        }
+        @keyframes scan-sweep {
+            0%   { transform: translateY(0);     opacity: 1 }
+            100% { transform: translateY(340px); opacity: 0 }
+        }
+        .wbox::before, .wbox::after {
+            content: '';
+            position: absolute;
+            width: 24px; height: 24px;
+            border-color: var(--mc);
+            border-style: solid;
+            z-index: 2;
+            transition: border-color .4s;
+        }
+        .wbox::before { top: 10px; left: 10px; border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
+        .wbox::after  { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
+        .wa { display: none; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+        .wr { font-family: 'Syne',sans-serif; font-size: 1.08rem; font-weight: 700; }
+
+        /* YouTube embed wrapper */
+        .yt-embed-wrap { display: flex; justify-content: center; width: 100%; }
+
+        /* MOOD CARDS (sad support) */
+        .mood-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            max-width: 520px;
+            width: 100%
+        }
+
+        .mood-card {
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            padding: 20px 16px;
+            cursor: pointer;
+            transition: all .3s;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .88rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .mood-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--mc);
+            box-shadow: 0 0 20px var(--mg)
+        }
+
+        .mood-card .mc-icon {
+            font-size: 1.8rem
+        }
+
+        /* CHAT BUBBLES */
+        .bubble {
+            display: inline-block;
+            max-width: 92%;
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 18px 18px 18px 4px;
+            padding: 14px 18px;
+            font-size: .92rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            animation: mi .3s ease
+        }
+
+        .bubble.user-bubble {
+            background: var(--mg);
+            border-color: var(--mc);
+            border-radius: 18px 18px 4px 18px;
+            margin-left: auto;
+            display: block;
+            text-align: right
+        }
+
+        .bubble.typing-bubble {
+            opacity: .7
+        }
+
+        @keyframes mi {
+            from {
+                opacity: 0;
+                transform: translateX(-10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+
+        .ai-label {
+            font-size: .66rem;
+            font-weight: 800;
+            color: var(--mc);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 4px
+        }
+
+        .chat-scroll {
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: .3rem;
+            text-align: left
+        }
+
+        .chat-scroll::-webkit-scrollbar {
+            width: 3px
+        }
+
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 2px
+        }
+
+        .chat-area {
+            text-align: left;
+            margin: .8rem 0
+        }
+
+        .chat-input-wrap {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: #e8e8f0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .92rem;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .chat-input:focus {
+            border-color: var(--mc);
+            box-shadow: 0 0 18px var(--mg)
+        }
+
+        .chat-input::placeholder {
+            color: #6b6b80
+        }
+
+        .chat-send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: var(--mc);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+            color: #000
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.06);
+            box-shadow: 0 0 18px var(--ms)
+        }
+
+        /* TIMER */
+        .timer-wrap {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 1rem auto
+        }
+
+        .timer-svg {
+            transform: rotate(-90deg)
+        }
+
+        .timer-circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, .08);
+            stroke-width: 7
+        }
+
+        .timer-circle {
+            fill: none;
+            stroke: var(--mc);
+            stroke-width: 7;
+            stroke-linecap: round;
+            stroke-dasharray: 408;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear
+        }
+
+        .timer-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.7rem
+        }
+
+        .timer-text small {
+            font-size: .62rem;
+            color: #6b6b80;
+            font-weight: 600;
+            margin-top: .1rem
+        }
+
+        .progress-bar-wrap {
+            background: rgba(255, 255, 255, .08);
+            border-radius: 50px;
+            height: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--mc), #34d399);
+            transition: width 1s ease
+        }
+
+        /* STUDY DASHBOARD */
+        #screen-study {
+            padding: 20px
+        }
+
+        .study-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 760px
+        }
+
+        .mode-badge {
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-family: 'Syne', sans-serif;
+            font-size: .73rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #000;
+            background: var(--mc)
+        }
+
+        .study-container {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 18px;
+            max-width: 760px;
+            width: 100%
+        }
+
+        .study-main {
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 18px;
+            padding: 28px
+        }
+
+        .study-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .widget {
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            padding: 18px
+        }
+
+        .widget h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #6b6b80;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 10px
+        }
+
+        .focus-task {
+            font-size: .96rem;
+            font-weight: 500;
+            line-height: 1.55;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border-left: 3px solid var(--mc);
+            background: var(--mg);
+            margin: 14px 0
+        }
+
+        .ai-tip {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(74, 222, 128, .06);
+            border: 1px solid rgba(74, 222, 128, .15);
+            font-size: .82rem;
+            font-weight: 500;
+            color: var(--mc);
+            margin-bottom: 14px
+        }
+
+        /* SCORE */
+        .score-section {
+            background: #111118;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            padding: 22px;
+            margin-top: 18px;
+            text-align: left;
+            max-width: 480px;
+            width: 100%
+        }
+
+        .score-section h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #6b6b80;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 14px
+        }
+
+        .score-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px
+        }
+
+        .score-input-wrap label {
+            display: block;
+            font-size: .75rem;
+            font-weight: 500;
+            color: #6b6b80;
+            margin-bottom: 6px
+        }
+
+        .score-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: #e8e8f0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            outline: none;
+            transition: border-color .2s;
+            text-align: center
+        }
+
+        .score-input:focus {
+            border-color: var(--mc)
+        }
+
+        .score-compare {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: .86rem;
+            font-weight: 700;
+            display: none
+        }
+
+        .score-compare.winning {
+            background: rgba(74, 222, 128, .1);
+            border: 1px solid rgba(74, 222, 128, .2);
+            color: #4ade80
+        }
+
+        .score-compare.losing {
+            background: rgba(248, 113, 113, .1);
+            border: 1px solid rgba(248, 113, 113, .2);
+            color: #f87171
+        }
+
+        .score-compare.tied {
+            background: rgba(250, 204, 21, .1);
+            border: 1px solid rgba(250, 204, 21, .2);
+            color: #facc15
+        }
+
+        .score-bar-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .5rem;
+            margin-top: .8rem
+        }
+
+        .score-bar-item {
+            text-align: center
+        }
+
+        .score-bar-item .s-label {
+            font-size: .7rem;
+            color: #6b6b80;
+            margin-bottom: .3rem
+        }
+
+        .score-bar-item .s-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800
+        }
+
+        .s-you {
+            color: var(--mc)
+        }
+
+        .s-friend {
+            color: #f87171
+        }
+
+        /* POST STUDY */
+        .post-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap
+        }
+
+        .post-action-btn {
+            flex: 1;
+            min-width: 140px;
+            max-width: 190px;
+            padding: 20px 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: #111118;
+            cursor: pointer;
+            transition: all .3s;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .88rem;
+            color: #e8e8f0;
+            text-align: center
+        }
+
+        .post-action-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--mc);
+            box-shadow: 0 0 20px var(--mg)
+        }
+
+        .pab-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 6px
+        }
+
+        /* TYPING DOTS */
+        .typing-dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            padding: 4px 0
+        }
+
+        .typing-dots span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--mc);
+            animation: tb 1.2s ease-in-out infinite
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: .2s
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: .4s
+        }
+
+        @keyframes tb {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+                opacity: .4
+            }
+
+            30% {
+                transform: translateY(-8px);
+                opacity: 1
+            }
+        }
+
+        /* MOODS */
+        body.sad {
+            --mc: #facc15;
+            --mg: rgba(250, 204, 21, .08);
+            --ms: rgba(250, 204, 21, .3)
+        }
+
+        body.happy {
+            --mc: #4ade80;
+            --mg: rgba(74, 222, 128, .08);
+            --ms: rgba(74, 222, 128, .3)
+        }
+
+        body.lazy {
+            --mc: #fb923c;
+            --mg: rgba(251, 146, 60, .08);
+            --ms: rgba(251, 146, 60, .3)
+        }
+
+        body.revenge {
+            --mc: #f87171;
+            --mg: rgba(248, 113, 113, .08);
+            --ms: rgba(248, 113, 113, .3)
+        }
+
+        body.stress {
+            --mc: #a78bfa;
+            --mg: rgba(167, 139, 250, .08);
+            --ms: rgba(167, 139, 250, .3)
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 18px
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        /* ELECTRIC BORDER CANVAS */
+        .study-mode-card {
+            position: relative;
+            overflow: visible !important;
+        }
+
+        /* ═══ BREAK SCREENS CSS ═══ */
+        .break-timer-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 999px;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: .88rem;
+            color: var(--mc); margin: .5rem 0;
+        }
+        /* GAME */
+        .game-grid {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+            max-width: 580px; width: 100%;
+        }
+        .game-card {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            background: #111118; border: 1px solid rgba(255,255,255,.08);
+            border-radius: 16px; padding: 18px 12px; cursor: pointer;
+            transition: all .25s; text-decoration: none; color: #e8e8f0;
+        }
+        .game-card:hover { border-color: var(--mc); transform: translateY(-3px); box-shadow: 0 0 18px var(--mg) }
+        .game-ic { font-size: 2rem }
+        .game-name { font-family:'Syne',sans-serif; font-weight: 700; font-size: .88rem; text-align:center }
+        .game-sub { font-size: .72rem; color: #6b6b80; text-align:center }
+        /* Memory game */
+        .memory-board { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; max-width: 320px; margin: 0 auto }
+        .mem-card {
+            width: 68px; height: 68px; border-radius: 12px;
+            background: #111118; border: 2px solid rgba(255,255,255,.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; cursor: pointer; transition: all .2s;
+            user-select: none;
+        }
+        .mem-card.flipped { border-color: var(--mc); background: rgba(74,222,128,.08) }
+        .mem-card.matched { border-color: #4ade80; opacity: .5; pointer-events: none }
+        /* FUNNY */
+        .funny-display { max-width: 480px; width: 100% }
+        .funny-meme-box {
+            background: #111118; border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px; padding: 32px 24px; text-align:center;
+            min-height: 180px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem; line-height: 1.65; margin-bottom: 10px;
+        }
+        .funny-caption { color: #6b6b80; font-size: .82rem; text-align:center; font-style:italic }
+        .funny-loading { color: #6b6b80; font-size: .9rem }
+        /* TALK */
+        .talk-modes {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            max-width: 520px; width: 100%; margin-bottom: .8rem;
+        }
+        .talk-mode-btn {
+            background: #111118; border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px; padding: 12px 14px; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; font-size: .84rem; font-weight: 500;
+            color: #e8e8f0; text-align: left; transition: all .2s;
+        }
+        .talk-mode-btn:hover { border-color: var(--mc); transform: translateY(-2px); color: var(--mc) }
+        /* RELAX */
+        .relax-options {
+            display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+            max-width: 480px; width: 100%; margin-bottom: .8rem;
+        }
+        .relax-card {
+            background: #111118; border: 1px solid rgba(255,255,255,.08);
+            border-radius: 16px; padding: 18px 10px; cursor: pointer;
+            text-align: center; transition: all .25s;
+        }
+        .relax-card:hover { border-color: var(--mc); transform: translateY(-3px); box-shadow: 0 0 16px var(--mg) }
+        .relax-ic { font-size: 1.8rem; margin-bottom: 6px }
+        .relax-title { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; margin-bottom:2px }
+        .relax-sub { font-size:.7rem; color:#6b6b80 }
+        .relax-module { width: 100%; display: flex; flex-direction: column; align-items: center; padding: .5rem 0 }
+        /* Breathing */
+        .breath-circle-wrap { display: flex; align-items: center; justify-content: center; padding: 1rem 0 }
+        .breath-circle {
+            width: 160px; height: 160px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(74,222,128,.15), rgba(74,222,128,.03));
+            border: 2px solid var(--mc); display: flex; flex-direction:column;
+            align-items: center; justify-content: center; gap: 4px;
+            font-family: 'Syne', sans-serif; font-weight: 700;
+            transition: transform 4s ease-in-out, border-color 1s;
+        }
+        .breath-circle span:first-child { font-size: .78rem; color: var(--mc); text-transform:uppercase; letter-spacing:.08em }
+        .breath-circle span:last-child { font-size: 2.8rem }
+        /* Sound */
+        .sound-player { text-align:center; padding: 1rem }
+        .sound-wave { display:flex; gap:4px; align-items:center; justify-content:center; height: 48px }
+        .sound-wave span {
+            display:block; width:5px; background: var(--mc);
+            border-radius: 3px; animation: wave-bar 1.2s ease-in-out infinite;
+        }
+        .sound-wave span:nth-child(1){height:14px;animation-delay:0s}
+        .sound-wave span:nth-child(2){height:28px;animation-delay:.1s}
+        .sound-wave span:nth-child(3){height:44px;animation-delay:.2s}
+        .sound-wave span:nth-child(4){height:36px;animation-delay:.3s}
+        .sound-wave span:nth-child(5){height:44px;animation-delay:.4s}
+        .sound-wave span:nth-child(6){height:28px;animation-delay:.5s}
+        .sound-wave span:nth-child(7){height:14px;animation-delay:.6s}
+        @keyframes wave-bar { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.6)} }
+        /* Stretch */
+        .stretch-card-display {
+            background: #111118; border: 1px solid rgba(255,255,255,.1);
+            border-radius: 20px; padding: 24px 28px; text-align:center; max-width: 380px; width:100%;
+        }
+        .stretch-ic { font-size: 3rem; margin-bottom: 8px }
+        .stretch-name { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; margin-bottom:8px }
+        .stretch-desc { color:#6b6b80; font-size:.85rem; line-height:1.55 }
+        /* Eyes */
+        .eye-exercise { text-align:center; padding:1rem }
+        .eye-target { font-size: 4rem; animation: eye-move 4s ease-in-out infinite }
+        @keyframes eye-move { 0%,100%{transform:translateX(0)} 25%{transform:translateX(40px)} 75%{transform:translateX(-40px)} }
+        /* Meditation */
+        .meditation-display { text-align:center; padding: 1rem }
+        .med-orb {
+            width: 120px; height: 120px; border-radius: 50%; margin: 0 auto;
+            background: radial-gradient(circle, var(--mc), transparent 70%);
+            opacity: .5; animation: med-pulse 4s ease-in-out infinite;
+        }
+        @keyframes med-pulse { 0%,100%{transform:scale(1);opacity:.4} 50%{transform:scale(1.3);opacity:.7} }
+
+        @media(max-width:650px) {
+            .game-grid { grid-template-columns: 1fr 1fr }
+            .relax-options { grid-template-columns: 1fr 1fr }
+            .talk-modes { grid-template-columns: 1fr }
+        }
+        .electric-canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .study-mode-card:hover .electric-canvas,
+        .study-mode-card.active-mode .electric-canvas {
+            opacity: 1;
+        }
+        .smc-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .mt1 {
+            margin-top: 1rem
+        }
+
+        .mt2 {
+            margin-top: 2rem
+        }
+
+        @media(max-width:650px) {
+
+            .mopts,
+            .mood-cards,
+            .study-modes-grid,
+            .score-inputs {
+                grid-template-columns: 1fr
+            }
+
+            .study-container {
+                grid-template-columns: 1fr
+            }
+
+            .study-header {
+                flex-direction: column;
+                gap: .7rem;
+                text-align: center
+            }
+
+            h1 {
+                font-size: 2rem
+            }
+        }
+    </style>
+</head>
+
+<body class="happy">
+    <div class="grid"></div>
+    <div class="orb o1"></div>
+    <div class="orb o2"></div>
+    <div class="app">
+
+        <!-- SCREEN 1: WELCOME -->
+        <div id="screen-welcome" class="screen active">
+            <div class="logo">
+                <div class="ld"></div>Project Empath
+            </div>
+            <div class="badge">✦ <span>AI-Powered</span> &nbsp;·&nbsp; Emotionally Aware &nbsp;·&nbsp; Adaptive</div>
+            <h1>Learning that <span class="gt">understands you.</span></h1>
+            <p class="sub">Not just <em>what</em> you're studying — but <em>how</em> you're feeling. Empath adapts to
+                your mood so you study smarter.</p>
+            <div class="mopts">
+                <div class="mopt" onclick="startVideo()">
+                    <div class="mopt-ic">📷</div>
+                    <h3>Use My Camera</h3>
+                    <p>Let Empath scan your face to detect your emotion automatically.</p>
+                </div>
+                <div class="mopt" onclick="goTo('screen-emoji')">
+                    <div class="mopt-ic">🙋</div>
+                    <h3>I'll Tell You</h3>
+                    <p>Prefer privacy? Tap the emoji that matches how you're feeling.</p>
+                </div>
+            </div>
+            <!-- SCORE TRACKER -->
+            <div class="score-section">
+                <h3>📊 Test Score Tracker</h3>
+                <div class="score-inputs">
+                    <div class="score-input-wrap"><label>Your Score</label><input class="score-input" type="number"
+                            id="my-score" placeholder="e.g. 85" min="0" max="100" oninput="compareScores()"></div>
+                    <div class="score-input-wrap"><label>Friend's Score</label><input class="score-input" type="number"
+                            id="friend-score" placeholder="e.g. 90" min="0" max="100" oninput="compareScores()"></div>
+                </div>
+                <div class="score-bar-wrap" id="score-bars" style="display:none">
+                    <div class="score-bar-item">
+                        <div class="s-label">YOU</div>
+                        <div class="s-val s-you" id="score-you-disp">—</div>
+                    </div>
+                    <div class="score-bar-item">
+                        <div class="s-label">FRIEND</div>
+                        <div class="s-val s-friend" id="score-friend-disp">—</div>
+                    </div>
+                </div>
+                <div class="score-compare" id="score-compare-msg"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: WEBCAM -->
+        <div id="screen-webcam" class="screen">
+            <div class="logo" style="justify-content:center">
+                <div class="ld"></div>Project Empath
+            </div>
+            <div class="tag">Just checking in 💙</div>
+            <h2>Reading your <span class="gt">expression...</span></h2>
+            <p style="color:#6b6b80;text-align:center;font-size:.9rem">Look naturally at the camera. Won't take long.</p>
+
+            <!-- Rectangular scanner box -->
+            <div class="wbox" id="wbox">
+                <div class="cam-placeholder" id="cam-placeholder">📷</div>
+                <div class="sbar" id="scan-bar"></div>
+                <div class="wov">
+                    <div class="wst" id="wst">Initializing camera...</div>
+                </div>
+            </div>
+
+            <!-- Confirm / reject result -->
+            <div class="wa" id="wa">
+                <div class="wr" id="wr"></div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+                    <button class="btn bp" onclick="confirmDetection()">Yes, that's right ✓</button>
+                    <button class="btn bg bs" onclick="rejectDetection()">That's wrong — let me choose</button>
+                </div>
+            </div>
+
+            <p style="color:#6b6b80;font-size:.85rem;margin-top:.5rem">Or tell me yourself:</p>
+            <div class="btn-row" style="margin-top:0">
+                <button class="btn bp" onclick="manualEmotion('happy')">😊 I'm good!</button>
+                <button class="btn bg" onclick="manualEmotion('sad')">😔 Not great</button>
+            </div>
+            <button class="btn bg bs" onclick="goTo('screen-welcome')" style="margin-top:12px">← Back</button>
+        </div>
+
+        <!-- SCREEN 3: EMOJI PICKER -->
+        <div id="screen-emoji" class="screen">
+            <div class="logo" style="justify-content:center">
+                <div class="ld"></div>Project Empath
+            </div>
+            <div class="tag">Checking in 💙</div>
+            <h2>How are you <span class="gt">feeling right now?</span></h2>
+            <div class="emoji-row" id="emoji-row">
+                <button class="emoji-btn" onclick="selectEmoji(this,'happy')" title="Happy">😊</button>
+                <button class="emoji-btn" onclick="selectEmoji(this,'excited')" title="Excited">🤩</button>
+                <button class="emoji-btn" onclick="selectEmoji(this,'neutral')" title="Neutral">😐</button>
+                <button class="emoji-btn" onclick="selectEmoji(this,'tired')" title="Tired">😴</button>
+                <button class="emoji-btn" onclick="selectEmoji(this,'sad')" title="Sad">😢</button>
+            </div>
+            <div id="emoji-confirm" class="hidden">
+                <div class="chat-area">
+                    <div class="bubble">
+                        <div class="ai-label">🤖 Empath AI</div><span id="emoji-response"></span>
+                    </div>
+                </div>
+                <div class="btn-row"><button class="btn bp" onclick="afterEmotion()">Continue →</button></div>
+            </div>
+            <button class="btn bg bs" onclick="goTo('screen-welcome')" style="margin-top:12px">← Back</button>
+        </div>
+
+        <!-- SCREEN 4: SAD SUPPORT -->
+        <div id="screen-sad" class="screen">
+            <div class="logo" style="justify-content:center">
+                <div class="ld"></div>Project Empath
+            </div>
+            <div class="tag">You're not alone 💙</div>
+            <h2>It's okay to <span class="gt">take a moment</span></h2>
+            <div class="chat-area chat-scroll mt1" id="sad-chat" style="max-width:520px;width:100%"></div>
+            <p style="color:#6b6b80;font-size:.85rem">What sounds helpful right now?</p>
+            <div class="mood-cards">
+                <div class="mood-card" onclick="pickRelax('game')"><span class="mc-icon">🎮</span>Play a quick game
+                </div>
+                <div class="mood-card" onclick="pickRelax('funny')"><span class="mc-icon">😂</span>Watch something funny
+                </div>
+                <div class="mood-card" onclick="pickRelax('talk')"><span class="mc-icon">💬</span>Talk to me</div>
+                <div class="mood-card" onclick="pickRelax('relax')"><span class="mc-icon">🎧</span>Relax for 5 minutes
+                </div>
+            </div>
+            <button class="btn bg bs" onclick="goTo('screen-modes')">Skip → Go study</button>
+        </div>
+
+        <!-- SCREEN 5A: GAME BREAK -->
+        <div id="screen-break-game" class="screen">
+            <div class="logo" style="justify-content:center"><div class="ld"></div>Project Empath</div>
+            <div class="tag">Dopamine reset 🎮</div>
+            <h2>Pick a <span class="gt">quick game</span></h2>
+            <p class="sub" style="font-size:.88rem;margin-bottom:0">2–5 min only. Timer auto-kicks you back.</p>
+            <div class="break-timer-pill" id="game-timer-pill">⏱ <span id="game-time-left">3:00</span></div>
+            <div class="game-grid">
+                <a class="game-card" href="https://play2048.co/" target="_blank" onclick="startGameTimer(180)">
+                    <span class="game-ic">🟨</span><span class="game-name">2048</span><span class="game-sub">1 round only</span>
+                </a>
+                <a class="game-card" href="https://www.google.com/fbx?fbx=snake_arcade" target="_blank" onclick="startGameTimer(120)">
+                    <span class="game-ic">🐍</span><span class="game-name">Snake</span><span class="game-sub">Google classic</span>
+                </a>
+                <a class="game-card" href="https://10fastfingers.com/typing-test/english" target="_blank" onclick="startGameTimer(120)">
+                    <span class="game-ic">⌨️</span><span class="game-name">Typing Test</span><span class="game-sub">2-min sprint</span>
+                </a>
+                <a class="game-card" href="https://www.chess.com/puzzles" target="_blank" onclick="startGameTimer(120)">
+                    <span class="game-ic">♟️</span><span class="game-name">Chess Puzzle</span><span class="game-sub">Single puzzle</span>
+                </a>
+                <div class="game-card" onclick="launchMemoryGame(); startGameTimer(180)">
+                    <span class="game-ic">🃏</span><span class="game-name">Memory Cards</span><span class="game-sub">Built-in mini-game</span>
+                </div>
+                <a class="game-card" href="https://humanbenchmark.com/tests/reactiontime" target="_blank" onclick="startGameTimer(60)">
+                    <span class="game-ic">⚡</span><span class="game-name">Reaction Time</span><span class="game-sub">1 minute</span>
+                </a>
+            </div>
+            <!-- Built-in memory game -->
+            <div id="memory-game-wrap" style="display:none;margin-top:1rem">
+                <div id="memory-board" class="memory-board"></div>
+                <p id="memory-status" style="color:#6b6b80;font-size:.82rem;margin-top:.5rem">Match all pairs!</p>
+            </div>
+            <div class="btn-row" style="margin-top:1rem">
+                <button class="btn-success" onclick="doneBreak()">✅ Done — back to study!</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5B: FUNNY BREAK -->
+        <!-- ══ ANTI-SCROLL FULLSCREEN OVERLAY (cats + lofi) ══ -->
+        <div id="break-overlay" style="
+            display:none; position:fixed; inset:0; z-index:9999;
+            background:#0a0a0f; overflow:hidden;
+            flex-direction:column; align-items:center; justify-content:center;
+            padding:28px 20px; gap:20px;
+        ">
+            <!-- CAT PANEL -->
+            <div id="overlay-cats" style="display:none;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:520px">
+                <div class="logo" style="justify-content:center"><div class="ld"></div>Project Empath</div>
+                <div class="tag">😸 Cute Cat Break</div>
+                <h2 style="text-align:center">Here's something <span class="gt">adorable</span></h2>
+                <div style="position:relative;width:100%;max-width:480px;border-radius:22px;overflow:hidden;background:#111118;border:1px solid rgba(255,255,255,.08)">
+                    <video
+                        id="cat-video"
+                        src="cat_video.mp4"
+                        autoplay
+                        loop
+                        playsinline
+                        controls
+                        style="width:100%;max-height:420px;object-fit:contain;border-radius:22px;display:block">
+                    </video>
+                    <div id="cat-timer-bar" style="position:absolute;bottom:0;left:0;height:4px;background:var(--mc);width:100%;transition:width 1s linear"></div>
+                </div>
+                <p id="cat-countdown-text" style="color:#6b6b80;font-size:.82rem">Auto-closing in <strong id="cat-secs" style="color:var(--mc)">30</strong>s — enjoy! 🐾</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+                    <button class="btn bg bs" onclick="closeBreakOverlay()">✅ Back to studying</button>
+                </div>
+                <p style="color:#6b6b80;font-size:.72rem;margin-top:-.4rem">⚠️ Scrolling blocked — stay focused after this!</p>
+            </div>
+            <!-- LOFI PANEL -->
+            <div id="overlay-lofi" style="display:none;flex-direction:column;align-items:center;gap:20px;width:100%;max-width:460px">
+                <div class="logo" style="justify-content:center"><div class="ld"></div>Project Empath</div>
+                <div class="tag" id="lofi-tag">🎵 Lo-fi Focus</div>
+                <h2 style="text-align:center" id="lofi-title">Focus <span class="gt">music</span></h2>
+                <!-- Pulsing orb -->
+                <div id="lofi-orb" style="width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 40% 40%, var(--mc), transparent 70%);opacity:.55;animation:med-pulse 2.8s ease-in-out infinite"></div>
+                <!-- Waveform bars -->
+                <div class="sound-wave" id="lofi-wave" style="gap:5px">
+                    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <!-- Controls -->
+                <div style="display:flex;gap:14px;align-items:center">
+                    <button id="lofi-play-btn" class="btn bp" style="font-size:.88rem;padding:12px 30px" onclick="toggleAudio()">▶ Play</button>
+                    <div style="display:flex;flex-direction:column;gap:4px">
+                        <label style="font-size:.68rem;color:#6b6b80;text-transform:uppercase;letter-spacing:.06em">Volume</label>
+                        <input type="range" id="volume-slider" min="0" max="100" value="60"
+                            oninput="setVolume(this.value)" style="width:120px;accent-color:var(--mc)">
+                    </div>
+                </div>
+                <p id="lofi-sub" style="color:#6b6b80;font-size:.78rem;text-align:center">Generated in-browser · no internet needed ✨</p>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+                    <button class="btn bg bs" id="lofi-switch-btn" onclick="switchLofi()" style="font-size:.8rem">🌧️ Switch to Rain</button>
+                    <button class="btn bg bs" onclick="closeBreakOverlay()">✅ Done relaxing</button>
+                </div>
+                <p style="color:#6b6b80;font-size:.72rem">⚠️ Scrolling blocked — stay in the zone!</p>
+            </div>
+        </div>
+
+        <!-- SCREEN 5B: FUNNY BREAK -->
+        <div id="screen-break-funny" class="screen">
+            <div class="logo" style="justify-content:center"><div class="ld"></div>Project Empath</div>
+            <div class="tag">Emotional reset 😸</div>
+            <h2>Ready for <span class="gt">cute cats?</span></h2>
+            <div style="font-size:5rem;animation:pulse 2s ease-in-out infinite">🐱</div>
+            <p class="sub" style="font-size:.95rem">Endless cute cat photos — no YouTube, no distractions.<br>Scrolling gets blocked so you actually come back. 😄</p>
+            <div class="btn-row">
+                <button class="btn bp" onclick="openCatOverlay()">😸 Show me the cats!</button>
+                <button class="btn bg bs" onclick="doneBreak()">✅ Skip — back to study</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5C: TALK BREAK (AI Companion) -->
+        <div id="screen-break-talk" class="screen">
+            <div class="logo" style="justify-content:center"><div class="ld"></div>Project Empath</div>
+            <div class="tag">AI Companion 💬</div>
+            <h2>What do you <span class="gt">need right now?</span></h2>
+            <div class="talk-modes">
+                <button class="talk-mode-btn" onclick="startTalkMode('roast')">🔥 Roast me into studying</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('commander')">🎖️ Army commander mode</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('genius')">🧠 Talk like I'm slacking genius</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('therapy')">🛋️ 60-second therapy</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('truth')">💀 Give me one harsh truth</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('story')">📖 Tell me a short story</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('debate')">⚔️ Debate me on something</button>
+                <button class="talk-mode-btn" onclick="startTalkMode('questions')">🔮 Ask me 3 deep questions</button>
+            </div>
+            <div id="talk-chat-area" class="chat-area chat-scroll" style="max-width:520px;width:100%;max-height:220px;display:none"></div>
+            <div class="chat-input-wrap" id="talk-input-wrap" style="max-width:520px;width:100%;display:none">
+                <input class="chat-input" type="text" id="talk-chat-input" placeholder="Reply..." onkeydown="if(event.key==='Enter')sendTalkReply()">
+                <button class="chat-send-btn" onclick="sendTalkReply()">➤</button>
+            </div>
+            <div class="btn-row" style="margin-top:1rem">
+                <button class="btn bg bs" onclick="doneBreak()">✅ Ready to study</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5D: RELAX BREAK -->
+        <div id="screen-break-relax" class="screen">
+            <div class="logo" style="justify-content:center"><div class="ld"></div>Project Empath</div>
+            <div class="tag">5-minute reset 🎧</div>
+            <h2>Choose your <span class="gt">relaxation</span></h2>
+            <div class="relax-options">
+                <div class="relax-card" onclick="startRelax('breath')">
+                    <div class="relax-ic">🫁</div>
+                    <div class="relax-title">4-7-8 Breathing</div>
+                    <div class="relax-sub">Guided animation</div>
+                </div>
+                <div class="relax-card" onclick="startRelax('music')">
+                    <div class="relax-ic">🎵</div>
+                    <div class="relax-title">Focus Music</div>
+                    <div class="relax-sub">Lo-fi concentration</div>
+                </div>
+                <div class="relax-card" onclick="startRelax('rain')">
+                    <div class="relax-ic">🌧️</div>
+                    <div class="relax-title">Rain Sounds</div>
+                    <div class="relax-sub">Brown noise</div>
+                </div>
+                <div class="relax-card" onclick="startRelax('stretch')">
+                    <div class="relax-ic">🧘</div>
+                    <div class="relax-title">Stretch Guide</div>
+                    <div class="relax-sub">Desk stretches</div>
+                </div>
+                <div class="relax-card" onclick="startRelax('eyes')">
+                    <div class="relax-ic">👁️</div>
+                    <div class="relax-title">Eye Rest</div>
+                    <div class="relax-sub">20-20-20 rule</div>
+                </div>
+                <div class="relax-card" onclick="startRelax('meditation')">
+                    <div class="relax-ic">🌙</div>
+                    <div class="relax-title">Micro Meditation</div>
+                    <div class="relax-sub">2-min guided</div>
+                </div>
+            </div>
+            <!-- Active relax display -->
+            <div id="relax-active" style="display:none;width:100%;max-width:480px">
+                <!-- Breathing -->
+                <div id="relax-breath" class="relax-module" style="display:none">
+                    <div class="breath-circle-wrap">
+                        <div class="breath-circle" id="breath-circle">
+                            <span id="breath-label">Inhale</span>
+                            <span id="breath-count">4</span>
+                        </div>
+                    </div>
+                    <p id="breath-phase-text" style="color:#6b6b80;font-size:.85rem;margin-top:.5rem">Breathe in through your nose...</p>
+                </div>
+                <!-- Music/Rain -->
+                <div id="relax-sound" class="relax-module" style="display:none">
+                    <div class="sound-player" style="text-align:center;padding:1.2rem 0">
+                        <div style="font-size:2.8rem;margin-bottom:10px" id="sound-icon">🎵</div>
+                        <p id="sound-label" style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin:0 0 6px">Lo-fi Focus Music</p>
+                        <p id="sound-sub" style="color:#6b6b80;font-size:.82rem;margin:0 0 16px">Full-screen player · scrolling blocked</p>
+                        <button class="btn bp" id="lofi-open-btn" onclick="openLofiOverlay('lofi')" style="font-size:.85rem;padding:12px 28px">🎵 Open Full-Screen Player</button>
+                    </div>
+                </div>
+                <!-- Stretch -->
+                <div id="relax-stretch" class="relax-module" style="display:none">
+                    <div class="stretch-card-display" id="stretch-card">
+                        <div class="stretch-ic" id="stretch-ic">🙆</div>
+                        <div class="stretch-name" id="stretch-name">Neck Roll</div>
+                        <div class="stretch-desc" id="stretch-desc">Slowly roll your head in a circle. 5 times each direction.</div>
+                    </div>
+                    <div class="break-timer-pill" id="stretch-timer-pill">⏱ <span id="stretch-time">0:30</span></div>
+                    <button class="btn bg bs" onclick="nextStretch()" style="margin-top:.5rem">Next stretch →</button>
+                </div>
+                <!-- Eyes -->
+                <div id="relax-eyes" class="relax-module" style="display:none">
+                    <div class="eye-exercise">
+                        <div class="eye-target" id="eye-target">👁️</div>
+                        <p id="eye-instruction" style="color:#6b6b80;font-size:.9rem;margin-top:1rem">Look at something 20 feet away for 20 seconds</p>
+                        <div class="break-timer-pill" id="eye-timer-pill">⏱ <span id="eye-time">0:20</span></div>
+                    </div>
+                </div>
+                <!-- Meditation -->
+                <div id="relax-meditation" class="relax-module" style="display:none">
+                    <div class="meditation-display">
+                        <div class="med-orb" id="med-orb"></div>
+                        <p id="med-text" style="font-size:.95rem;line-height:1.7;max-width:380px;margin:.8rem auto 0;color:#c8c8d8"></p>
+                    </div>
+                </div>
+            </div>
+            <!-- Relax timer -->
+            <div class="timer-wrap" id="relax-timer-wrap" style="width:150px;height:150px;margin:0.5rem auto">
+                <svg class="timer-svg" width="150" height="150" viewBox="0 0 150 150">
+                    <circle class="timer-circle-bg" cx="75" cy="75" r="65" />
+                    <circle class="timer-circle" id="timer-ring" cx="75" cy="75" r="65" />
+                </svg>
+                <div class="timer-text"><span id="timer-display">5:00</span><small>remaining</small></div>
+            </div>
+            <div class="progress-bar-wrap" style="max-width:360px">
+                <div class="progress-bar-fill" id="break-progress" style="width:100%"></div>
+            </div>
+            <div class="btn-row">
+                <button class="btn-success" onclick="doneBreak()">✅ Feeling better — let's study!</button>
+                <button class="btn bg bs" onclick="addTime()">🔄 2 more minutes</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: STUDY MODE SELECTION -->
+        <div id="screen-modes" class="screen">
+            <div class="logo" style="justify-content:center">
+                <div class="ld"></div>Project Empath
+            </div>
+            <div class="tag">Ready to focus 🎯</div>
+            <h1>Pick your <span class="gt">study mode</span></h1>
+            <p class="sub">Your AI will adapt tasks, pacing, and encouragement to how you're feeling.</p>
+            <div class="study-modes-grid">
+                <div class="study-mode-card smc-revenge" onclick="selectStudyMode('revenge',this)" data-electric-color="#f87171" data-electric-chaos="0.18" data-electric-speed="2.2">
+                    <canvas class="electric-canvas"></canvas>
+                    <div class="smc-content">
+                        <span class="smc-icon">⚔️</span>
+                        <div class="smc-title text-red">Revenge Mode</div>
+                        <div class="smc-desc">Study to crush your competition. Timer-driven, challenge-based, relentless.</div>
+                    </div>
+                </div>
+                <div class="study-mode-card smc-lazy" onclick="selectStudyMode('lazy',this)" data-electric-color="#fb923c" data-electric-chaos="0.06" data-electric-speed="0.5">
+                    <canvas class="electric-canvas"></canvas>
+                    <div class="smc-content">
+                        <span class="smc-icon">🛋️</span>
+                        <div class="smc-title text-accent">Lazy Mode</div>
+                        <div class="smc-desc">Low energy? Short 10-min blocks, minimal pressure. Slow but steady.</div>
+                    </div>
+                </div>
+                <div class="study-mode-card smc-stress" onclick="selectStudyMode('stress',this)" data-electric-color="#a78bfa" data-electric-chaos="0.14" data-electric-speed="1.4">
+                    <canvas class="electric-canvas"></canvas>
+                    <div class="smc-content">
+                        <span class="smc-icon">😰</span>
+                        <div class="smc-title text-yellow">Stress Mode</div>
+                        <div class="smc-desc">Exam panic? Calm UI, priority tasks. Focus on what matters most.</div>
+                    </div>
+                </div>
+                <div class="study-mode-card smc-happy" onclick="selectStudyMode('happy',this)" data-electric-color="#4ade80" data-electric-chaos="0.09" data-electric-speed="0.9">
+                    <canvas class="electric-canvas"></canvas>
+                    <div class="smc-content">
+                        <span class="smc-icon">😊</span>
+                        <span class="sparkle-badge">✨</span>
+                        <div class="smc-title text-green">Happy Mode</div>
+                        <div class="smc-desc">Feeling great! Balanced flow with positive energy. Let's make today count.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: STUDY DASHBOARD -->
+        <div id="screen-study" class="screen">
+            <div class="study-header">
+                <div class="logo">
+                    <div class="ld"></div>Empath
+                </div>
+                <span class="mode-badge" id="study-mode-badge">😊 Happy Mode</span>
+            </div>
+            <div class="study-container">
+                <div class="study-main">
+                    <h2 id="study-mode-title" style="text-align:left">Happy Mode</h2>
+                    <p id="study-mode-tagline" style="text-align:left;color:#6b6b80;margin-top:8px"></p>
+                    <div class="focus-task" id="focus-task-text">📚 Loading your task...</div>
+                    <div class="ai-tip" id="ai-tip-text">💡 Loading tip...</div>
+                    <div>
+                        <div
+                            style="font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#6b6b80;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">
+                            🤖 Study AI Chat</div>
+                        <div class="chat-scroll" id="study-chat" style="max-height:220px"></div>
+                        <div class="chat-input-wrap">
+                            <input class="chat-input" type="text" id="study-chat-input"
+                                placeholder="Ask me anything about your studies..."
+                                onkeydown="if(event.key==='Enter')sendStudyChat()">
+                            <button class="chat-send-btn" onclick="sendStudyChat()">➤</button>
+                        </div>
+                    </div>
+                    <div class="btn-row" style="justify-content:flex-start">
+                        <button class="btn-success" onclick="finishStudy()">✅ Done Studying</button>
+                        <button class="btn bg bs" onclick="goTo('screen-modes')">↩ Change Mode</button>
+                    </div>
+                </div>
+                <div class="study-sidebar">
+                    <div class="widget">
+                        <h3>⏱ Focus Timer</h3>
+                        <div class="timer-wrap" style="width:110px;height:110px;margin:0 auto">
+                            <svg class="timer-svg" width="110" height="110" viewBox="0 0 110 110">
+                                <defs>
+                                    <linearGradient id="sGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:var(--mc)" />
+                                        <stop offset="100%" style="stop-color:#f59e0b" />
+                                    </linearGradient>
+                                </defs>
+                                <circle class="timer-circle-bg" cx="55" cy="55" r="47" stroke-width="6" />
+                                <circle id="study-timer-ring" fill="none" stroke="url(#sGrad)" stroke-width="6"
+                                    stroke-linecap="round" cx="55" cy="55" r="47"
+                                    style="stroke-dasharray:295;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:55px 55px;transition:stroke-dashoffset 1s linear;" />
+                            </svg>
+                            <div class="timer-text" style="font-size:1.15rem"><span
+                                    id="study-timer-display">25:00</span><small>Pomodoro</small></div>
+                        </div>
+                        <div class="btn-row" style="gap:6px;margin-top:8px">
+                            <button class="btn bp bs" onclick="startStudyTimer()">▶ Start</button>
+                            <button class="btn bg bs" onclick="togglePause()">⏸ Pause</button>
+                        </div>
+                    </div>
+                    <div class="widget">
+                        <h3>📈 Session Progress</h3>
+                        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:6px">
+                            <span>Today</span><span id="progress-pct">0%</span></div>
+                        <div class="progress-bar-wrap" style="margin:0;max-width:100%">
+                            <div class="progress-bar-fill" id="study-progress-fill" style="width:0%"></div>
+                        </div>
+                        <div style="font-size:.72rem;color:#6b6b80;margin-top:6px" id="sessions-done">0 sessions
+                            completed</div>
+                    </div>
+                    <div class="widget" id="challenge-widget" style="display:none">
+                        <h3>⚔️ Rival Challenge</h3>
+                        <div id="rival-score-display" style="font-size:.88rem;font-weight:700;color:#f87171">Beat your
+                            rival!</div>
+                        <div id="rival-score-sub" style="font-size:.72rem;color:#6b6b80;margin-top:6px">Enter scores on
+                            home page</div>
+                    </div>
+                    <div class="widget">
+                        <h3>📊 My vs Friend</h3>
+                        <div style="display:flex;justify-content:space-around;margin-top:6px">
+                            <div style="text-align:center">
+                                <div style="font-size:.65rem;color:#6b6b80;margin-bottom:2px">YOU</div>
+                                <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--mc)"
+                                    id="sidebar-my-score">—</div>
+                            </div>
+                            <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#6b6b80">vs
+                            </div>
+                            <div style="text-align:center">
+                                <div style="font-size:.65rem;color:#6b6b80;margin-bottom:2px">FRIEND</div>
+                                <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:#f87171"
+                                    id="sidebar-friend-score">—</div>
+                            </div>
+                        </div>
+                        <div id="sidebar-score-status"
+                            style="font-size:.72rem;text-align:center;margin-top:6px;color:#6b6b80">Add scores on home
+                            page</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 8: POST STUDY -->
+        <div id="screen-post" class="screen">
+            <div style="max-width:500px;text-align:center">
+                <div style="font-size:3.2rem;margin-bottom:8px">🌟</div>
+                <h1>You showed up <span class="gt">today.</span></h1>
+                <p class="sub mt1">That's how goals get crushed — one session at a time. Even showing up counts.</p>
+                <div class="chat-area mt2" id="post-chat">
+                    <div class="bubble">
+                        <div class="ai-label">🤖 Empath AI</div>I hope you're feeling much better now 💙 How do you feel
+                        about your preparation today?
+                    </div>
+                </div>
+                <div class="emoji-row mt1" id="post-emoji-row">
+                    <button class="emoji-btn" onclick="postEmoji(this,'great')">😊</button>
+                    <button class="emoji-btn" onclick="postEmoji(this,'okay')">😐</button>
+                    <button class="emoji-btn" onclick="postEmoji(this,'tired')">😴</button>
+                    <button class="emoji-btn" onclick="postEmoji(this,'stressed')">😰</button>
+                </div>
+                <p style="color:#6b6b80;font-size:.8rem;margin-top:14px">What would you like to do next?</p>
+                <div class="post-actions mt1">
+                    <button class="post-action-btn" onclick="goTo('screen-welcome')"><span class="pab-icon">🧠</span>New
+                        Session</button>
+                    <button class="post-action-btn" onclick="goTo('screen-modes')"><span
+                            class="pab-icon">🔁</span>Switch Mode</button>
+                </div>
+                <div class="btn-row mt2"><button class="btn bg" onclick="goTo('screen-welcome')">🏠 Back to
+                        Home</button></div>
+            </div>
+        </div>
+
+    </div><!-- /app -->
+
+    <script>
+        // ═══ STATE ═══
+        let currentEmotion = 'neutral', studyMode = 'happy', breakTimerInterval = null, breakSecondsLeft = 300, breakTotalSeconds = 300;
+        let studyTimerInterval = null, studySecondsLeft = 25 * 60, studyPaused = false, sessionsCompleted = 0;
+        let videoStream = null, faceDetectionInterval = null, studyChatHistory = [], offlineModeActive = false;
+
+        // ═══ NAVIGATION ═══
+        function goTo(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0) }
+        function setTheme(t) { document.body.className = ''; if (t) document.body.classList.add(t) }
+
+        // ═══ SCORE TRACKER ═══
+        function compareScores() {
+            const my = parseFloat(document.getElementById('my-score').value), friend = parseFloat(document.getElementById('friend-score').value);
+            const msg = document.getElementById('score-compare-msg'), bars = document.getElementById('score-bars');
+            if (!isNaN(my) && !isNaN(friend)) {
+                bars.style.display = 'grid'; document.getElementById('score-you-disp').textContent = my; document.getElementById('score-friend-disp').textContent = friend;
+                msg.style.display = 'block'; document.getElementById('sidebar-my-score').textContent = my; document.getElementById('sidebar-friend-score').textContent = friend;
+                const diff = my - friend;
+                if (diff > 0) { msg.className = 'score-compare winning'; msg.textContent = `🏆 You're ahead by ${diff} points! Keep the momentum!`; document.getElementById('sidebar-score-status').textContent = `You lead by ${diff} pts 🏆` }
+                else if (diff < 0) { msg.className = 'score-compare losing'; msg.textContent = `⚔️ ${Math.abs(diff)} points behind — time to level up!`; document.getElementById('sidebar-score-status').textContent = `${Math.abs(diff)} pts behind ⚔️`; document.getElementById('rival-score-display').textContent = `Close ${Math.abs(diff)} point gap!`; document.getElementById('rival-score-sub').textContent = `Friend: ${friend} | You: ${my}` }
+                else { msg.className = 'score-compare tied'; msg.textContent = `🤝 It's a tie! One good session could change everything.`; document.getElementById('sidebar-score-status').textContent = `Tied at ${my} pts 🤝` }
+            } else { bars.style.display = 'none'; msg.style.display = 'none' }
+        }
+
+        // ═══ FACE API + WEBCAM (rectangular scanner) ═══
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+        let detectedEmotion = null;
+        async function loadModels() { try { await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL); await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL); return true } catch (e) { return false } }
+        function stopCamera() { if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null } if (faceDetectionInterval) { clearInterval(faceDetectionInterval); faceDetectionInterval = null } }
+
+        async function startVideo() {
+            goTo('screen-webcam');
+            const placeholder = document.getElementById('cam-placeholder');
+            const wst = document.getElementById('wst');
+            const wa = document.getElementById('wa');
+            wa.style.display = 'none';
+            document.getElementById('scan-bar').style.display = 'block';
+            wst.textContent = 'Requesting camera access...';
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const vid = document.createElement('video');
+                vid.srcObject = videoStream; vid.autoplay = true; vid.playsinline = true; vid.id = 'cam-video-el';
+                placeholder.style.display = 'none';
+                placeholder.insertAdjacentElement('afterend', vid);
+                wst.textContent = 'Loading face detection models...';
+                const modelsOk = await loadModels();
+                if (!modelsOk) { wst.textContent = 'Face detection unavailable — use buttons below'; return; }
+                wst.textContent = 'Analyzing your expression...';
+                await new Promise(r => vid.onloadedmetadata = r);
+                faceDetectionInterval = setInterval(async () => {
+                    if (!vid || !videoStream) { clearInterval(faceDetectionInterval); return; }
+                    try {
+                        const det = await faceapi.detectSingleFace(vid, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+                        if (det && det.expressions) {
+                            const [emotion, conf] = Object.entries(det.expressions).sort((a, b) => b[1] - a[1])[0];
+                            if (conf > 0.6) {
+                                clearInterval(faceDetectionInterval); faceDetectionInterval = null;
+                                detectedEmotion = mapExpr(emotion);
+                                const emoji = emojiFor(detectedEmotion);
+                                setTheme(detectedEmotion === 'excited' ? 'happy' : detectedEmotion);
+                                wst.textContent = 'Detection complete!';
+                                document.getElementById('scan-bar').style.display = 'none';
+                                document.getElementById('wr').innerHTML = `${emoji} I'm reading: <strong style="color:var(--mc)">${labelFor(detectedEmotion)}</strong> (${(conf*100).toFixed(0)}% confident)`;
+                                wa.style.display = 'flex';
+                            }
+                        }
+                    } catch (_) {}
+                }, 500);
+            } catch (err) {
+                placeholder.innerHTML = '<div style="font-size:3rem">📷</div>';
+                wst.textContent = 'Camera access denied — use buttons below';
+            }
+        }
+
+        function confirmDetection() { stopCamera(); removeCamVideo(); currentEmotion = detectedEmotion || 'happy'; routeEmotion(currentEmotion); }
+        function rejectDetection() { stopCamera(); removeCamVideo(); goTo('screen-emoji'); }
+        function removeCamVideo() { const v = document.getElementById('cam-video-el'); if (v) v.remove(); const ph = document.getElementById('cam-placeholder'); ph.innerHTML = '📷'; ph.style.display = 'flex'; document.getElementById('scan-bar').style.display = 'block'; document.getElementById('wa').style.display = 'none'; }
+        function routeEmotion(e) { if (e === 'sad' || e === 'tired') { setTheme('sad'); goTo('screen-sad'); typeSadChat(); } else { goTo('screen-modes'); } }
+
+        function mapExpr(e) { return { happy: 'happy', sad: 'sad', angry: 'sad', fearful: 'sad', disgusted: 'tired', surprised: 'excited', neutral: 'neutral' }[e] || 'neutral' }
+        function emojiFor(e) { return { happy: '😊', sad: '😢', tired: '😴', excited: '🤩', neutral: '😐' }[e] || '😐' }
+        function labelFor(e) { return { happy: 'Normal / Happy', sad: 'Sad / Anxious', tired: 'Tired / Low energy', excited: 'Excited / Energized', neutral: 'Neutral' }[e] || 'Neutral'; }
+        function manualEmotion(e) { stopCamera(); removeCamVideo(); detectedEmotion = e; currentEmotion = e; routeEmotion(e); }
+
+        // ═══ EMOJI PICKER ═══
+        const emojiMap = { happy: "Love that energy! 🌟 Let's channel it into an amazing study session.", excited: "You're on fire today! 🔥 Ready to make this session legendary?", neutral: "That's totally fine. Let's ease into it together 🙂", tired: "Feeling a bit drained? No worries — we'll keep it gentle today 🌙", sad: "Hey, I see you. It's okay to not be okay 💙 Let me help you feel a bit better first." };
+        function selectEmoji(btn, emotion) { currentEmotion = emotion; document.querySelectorAll('#emoji-row .emoji-btn').forEach(b => { b.classList.remove('selected', 'faded'); if (b !== btn) b.classList.add('faded') }); btn.classList.add('selected'); document.getElementById('emoji-response').textContent = emojiMap[emotion]; document.getElementById('emoji-confirm').classList.remove('hidden') }
+        function afterEmotion() { if (currentEmotion === 'sad' || currentEmotion === 'tired') { setTheme('sad'); goTo('screen-sad'); typeSadChat() } else { goTo('screen-modes') } }
+
+        // ═══ SAD SUPPORT ═══
+        const sadMsgs = ["Hey, it's totally okay to feel this way. I'm here for you 💙", "You don't have to push through everything alone.", "Let's take a short break before we start studying. What sounds helpful right now?"];
+        function typeSadChat() { const chat = document.getElementById('sad-chat'); chat.innerHTML = ''; sadMsgs.forEach((msg, i) => { setTimeout(() => { const b = document.createElement('div'); b.className = 'bubble'; b.innerHTML = `<div class="ai-label">🤖 Empath AI</div>${msg}`; chat.appendChild(b); chat.scrollTop = chat.scrollHeight }, i * 900) }) }
+
+        function pickRelax(type) {
+            clearInterval(breakTimerInterval); breakTimerInterval = null;
+            if (type === 'game') { goTo('screen-break-game'); }
+            else if (type === 'funny') { goTo('screen-break-funny'); }
+            else if (type === 'talk') { goTo('screen-break-talk'); resetTalkChat(); }
+            else if (type === 'relax') { goTo('screen-break-relax'); resetRelax(); }
+        }
+        function doneBreak() {
+            clearInterval(breakTimerInterval); breakTimerInterval = null;
+            clearInterval(gameTimerInterval); gameTimerInterval = null;
+            clearInterval(breathInterval); breathInterval = null;
+            clearInterval(stretchInterval); stretchInterval = null;
+            clearInterval(eyeInterval); eyeInterval = null;
+            clearTimeout(medTimer); medTimer = null;
+            stopAudio();
+            goTo('screen-modes');
+        }
+        function addTime() { breakSecondsLeft += 120; breakTotalSeconds += 120; updateBreakDisplay(); }
+        function startBreakTimer() {
+            breakTimerInterval = setInterval(() => {
+                if (breakSecondsLeft <= 0) { clearInterval(breakTimerInterval); doneBreak(); return; }
+                breakSecondsLeft--; updateBreakDisplay();
+                const p = breakSecondsLeft / breakTotalSeconds;
+                const ring = document.getElementById('timer-ring'); if (ring) ring.style.strokeDashoffset = 408 * (1 - p);
+                const prog = document.getElementById('break-progress'); if (prog) prog.style.width = (p * 100) + '%';
+            }, 1000);
+        }
+        function updateBreakDisplay() { const m = Math.floor(breakSecondsLeft / 60), s = breakSecondsLeft % 60; const el = document.getElementById('timer-display'); if (el) el.textContent = `${m}:${s.toString().padStart(2, '0')}`; }
+
+        // ═══ GAME BREAK ═══
+        let gameTimerInterval = null, gameSecondsLeft = 180;
+        function startGameTimer(secs) {
+            clearInterval(gameTimerInterval); gameSecondsLeft = secs;
+            const pill = document.getElementById('game-time-left');
+            gameTimerInterval = setInterval(() => {
+                if (gameSecondsLeft <= 0) { clearInterval(gameTimerInterval); document.getElementById('game-timer-pill').style.background='rgba(248,113,113,.15)'; document.getElementById('game-timer-pill').style.borderColor='#f87171'; return; }
+                gameSecondsLeft--; const m=Math.floor(gameSecondsLeft/60),s=gameSecondsLeft%60; if(pill) pill.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+            }, 1000);
+        }
+        const memEmojis=['🍕','🦊','🌸','⚡','🎸','🐬','🍄','🌈'];
+        let memCards=[],memFlipped=[],memMatched=0,memLocked=false;
+        function launchMemoryGame() {
+            document.getElementById('memory-game-wrap').style.display='block';
+            const board=document.getElementById('memory-board'); board.innerHTML=''; memMatched=0; memFlipped=[]; memLocked=false;
+            memCards=[...memEmojis,...memEmojis].sort(()=>Math.random()-.5);
+            memCards.forEach((em,i)=>{ const c=document.createElement('div'); c.className='mem-card'; c.dataset.idx=i; c.dataset.val=em; c.textContent='❓'; c.onclick=()=>flipMemCard(c); board.appendChild(c); });
+        }
+        function flipMemCard(card) {
+            if(memLocked||card.classList.contains('flipped')||card.classList.contains('matched')) return;
+            card.textContent=card.dataset.val; card.classList.add('flipped'); memFlipped.push(card);
+            if(memFlipped.length===2) {
+                memLocked=true;
+                if(memFlipped[0].dataset.val===memFlipped[1].dataset.val) { memFlipped.forEach(c=>c.classList.add('matched')); memMatched++; memFlipped=[]; memLocked=false; if(memMatched===memEmojis.length) document.getElementById('memory-status').textContent='🎉 You matched all pairs!'; }
+                else { setTimeout(()=>{ memFlipped.forEach(c=>{c.classList.remove('flipped');c.textContent='❓'}); memFlipped=[]; memLocked=false; },900); }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // CAT + LOFI OVERLAY  ·  ANTI-SCROLL ENGINE
+        // ═══════════════════════════════════════════════════
+
+        let overlayScrollY = 0;
+
+        // ── Lock scroll (position:fixed trick works on all browsers) ──
+        function lockScroll() {
+            overlayScrollY = window.scrollY;
+            document.body.style.position   = 'fixed';
+            document.body.style.top        = `-${overlayScrollY}px`;
+            document.body.style.left       = '0';
+            document.body.style.right      = '0';
+            document.body.style.overflowY  = 'scroll'; // keep scrollbar width stable
+        }
+        function unlockScroll() {
+            document.body.style.position  = '';
+            document.body.style.top       = '';
+            document.body.style.left      = '';
+            document.body.style.right     = '';
+            document.body.style.overflowY = '';
+            window.scrollTo(0, overlayScrollY);
+        }
+
+        function showOverlay(panel) {
+            // Hide both panels first
+            document.getElementById('overlay-cats').style.display = 'none';
+            document.getElementById('overlay-lofi').style.display = 'none';
+            // Show requested
+            const el = document.getElementById(panel);
+            el.style.display = 'flex';
+            // Show the overlay itself
+            const ov = document.getElementById('break-overlay');
+            ov.style.display = 'flex';
+            lockScroll();
+        }
+
+        function closeBreakOverlay() {
+            stopAudio();
+            clearCatTimer();
+            const vid = document.getElementById('cat-video');
+            if (vid) { vid.pause(); }
+            document.getElementById('break-overlay').style.display = 'none';
+            unlockScroll();
+        }
+
+        // ── CAT VIDEO ────────────────────────────────────────
+        let catTimer = null, catSecsLeft = 30;
+
+        function openCatOverlay() {
+            showOverlay('overlay-cats');
+            const vid = document.getElementById('cat-video');
+            vid.currentTime = 0;
+            vid.play().catch(()=>{});
+            startCatTimer();
+        }
+
+        function startCatTimer() {
+            catSecsLeft = 30;
+            updateCatTimer();
+            catTimer = setInterval(() => {
+                catSecsLeft--;
+                updateCatTimer();
+                if (catSecsLeft <= 0) { clearCatTimer(); closeBreakOverlay(); doneBreak(); }
+            }, 1000);
+        }
+        function updateCatTimer() {
+            const el = document.getElementById('cat-secs');
+            if (el) el.textContent = catSecsLeft;
+            const bar = document.getElementById('cat-timer-bar');
+            if (bar) bar.style.width = (catSecsLeft / 30 * 100) + '%';
+        }
+        function clearCatTimer() { if (catTimer) { clearInterval(catTimer); catTimer = null; } }
+
+        // ── LOFI OVERLAY ─────────────────────────────────────
+        let currentLofiType = 'lofi';
+
+        function openLofiOverlay(type) {
+            currentLofiType = type;
+            updateLofiPanel(type);
+            showOverlay('overlay-lofi');
+            startAudio(type);
+        }
+
+        function updateLofiPanel(type) {
+            const tag   = document.getElementById('lofi-tag');
+            const title = document.getElementById('lofi-title');
+            const sub   = document.getElementById('lofi-sub');
+            const btn   = document.getElementById('lofi-switch-btn');
+            const orb   = document.getElementById('lofi-orb');
+            if (type === 'lofi') {
+                tag.textContent   = '🎵 Lo-fi Focus';
+                title.innerHTML   = 'Focus <span class="gt">music</span>';
+                sub.textContent   = 'Lo-fi chords · generated in-browser · no internet needed ✨';
+                btn.textContent   = '🌧️ Switch to Rain';
+                btn.onclick       = () => switchLofi();
+                orb.style.background = 'radial-gradient(circle at 40% 40%, var(--mc), transparent 70%)';
+            } else {
+                tag.textContent   = '🌧️ Rain Sounds';
+                title.innerHTML   = 'Brown <span class="gt">noise</span>';
+                sub.textContent   = 'Rain ambience · generated in-browser · no internet needed ✨';
+                btn.textContent   = '🎵 Switch to Lo-fi';
+                btn.onclick       = () => switchLofi();
+                orb.style.background = 'radial-gradient(circle at 40% 40%, #60a5fa, transparent 70%)';
+            }
+        }
+
+        function switchLofi() {
+            currentLofiType = currentLofiType === 'lofi' ? 'rain' : 'lofi';
+            stopAudio();
+            updateLofiPanel(currentLofiType);
+            startAudio(currentLofiType);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // WEB AUDIO SYNTH ENGINE (lofi chords + rain noise)
+        // ═══════════════════════════════════════════════════
+        let audioCtx = null, audioNodes = [], audioPlaying = false, audioType = null, masterGain = null;
+
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function stopAudio() {
+            audioNodes.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch(e){} });
+            audioNodes = [];
+            if (masterGain) { try { masterGain.disconnect(); } catch(e){} masterGain = null; }
+            audioPlaying = false;
+            const btn = document.getElementById('lofi-play-btn');
+            if (btn) btn.textContent = '▶ Play';
+        }
+
+        function startAudio(type) {
+            stopAudio(); audioType = type;
+            const ctx = getAudioCtx();
+            masterGain = ctx.createGain();
+            masterGain.gain.value = 0.6;
+            masterGain.connect(ctx.destination);
+            if (type === 'lofi') buildLofi(ctx, masterGain);
+            else buildRain(ctx, masterGain);
+            audioPlaying = true;
+            const btn = document.getElementById('lofi-play-btn');
+            if (btn) btn.textContent = '⏸ Pause';
+        }
+
+        function toggleAudio() {
+            if (audioPlaying) { stopAudio(); }
+            else { startAudio(audioType || 'lofi'); }
+        }
+
+        function setVolume(val) {
+            if (masterGain) masterGain.gain.value = val / 100;
+        }
+
+        function buildLofi(ctx, dest) {
+            const chords = [
+                [261.63,329.63,392.00,493.88], // Cmaj7
+                [220.00,261.63,329.63,440.00], // Am7
+                [174.61,220.00,261.63,349.23], // Fmaj7
+                [196.00,246.94,293.66,392.00], // G7
+            ];
+            let idx = 0; const dur = 4;
+            function chord() {
+                chords[idx % chords.length].forEach(f => {
+                    const o = ctx.createOscillator(), g = ctx.createGain();
+                    o.type = 'sine'; o.frequency.value = f;
+                    g.gain.setValueAtTime(0, ctx.currentTime);
+                    g.gain.linearRampToValueAtTime(0.065, ctx.currentTime + .4);
+                    g.gain.linearRampToValueAtTime(0.065, ctx.currentTime + dur - .5);
+                    g.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+                    o.connect(g); g.connect(dest); o.start(); o.stop(ctx.currentTime + dur);
+                    audioNodes.push(o);
+                });
+                const b = ctx.createOscillator(), bg = ctx.createGain();
+                b.type = 'triangle'; b.frequency.value = chords[idx % chords.length][0] / 2;
+                bg.gain.setValueAtTime(0, ctx.currentTime);
+                bg.gain.linearRampToValueAtTime(.1, ctx.currentTime + .6);
+                bg.gain.linearRampToValueAtTime(0, ctx.currentTime + dur);
+                b.connect(bg); bg.connect(dest); b.start(); b.stop(ctx.currentTime + dur);
+                audioNodes.push(b); idx++;
+            }
+            // Warm vinyl hiss
+            const hBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+            const hd = hBuf.getChannelData(0);
+            for(let i=0;i<hd.length;i++) hd[i]=(Math.random()*2-1)*.01;
+            const hn = ctx.createBufferSource(), hf = ctx.createBiquadFilter();
+            hn.buffer = hBuf; hn.loop = true; hf.type = 'highpass'; hf.frequency.value = 2200;
+            hn.connect(hf); hf.connect(dest); hn.start(); audioNodes.push(hn);
+            chord();
+            const iv = setInterval(()=>{ if(!audioPlaying){clearInterval(iv);return;} chord(); }, dur*1000);
+        }
+
+        function buildRain(ctx, dest) {
+            // Brown noise (lowpass filtered white noise)
+            const sz = ctx.sampleRate * 4;
+            const buf = ctx.createBuffer(2, sz, ctx.sampleRate);
+            for(let ch=0;ch<2;ch++){
+                const d = buf.getChannelData(ch); let last=0;
+                for(let i=0;i<sz;i++){ last=(last+.02*(Math.random()*2-1))/1.02; d[i]=last*3.5; }
+            }
+            const ns = ctx.createBufferSource(), lp = ctx.createBiquadFilter();
+            ns.buffer = buf; ns.loop = true; lp.type='lowpass'; lp.frequency.value=600;
+            ns.connect(lp); lp.connect(dest); ns.start(); audioNodes.push(ns);
+            // High sparkle (rain detail)
+            const hb = ctx.createBuffer(1, sz, ctx.sampleRate);
+            const hd = hb.getChannelData(0);
+            for(let i=0;i<sz;i++) hd[i]=(Math.random()*2-1)*.14;
+            const hs = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), hg = ctx.createGain();
+            hs.buffer=hb; hs.loop=true; bp.type='bandpass'; bp.frequency.value=3000; bp.Q.value=.5; hg.gain.value=.16;
+            hs.connect(bp); bp.connect(hg); hg.connect(dest); hs.start(); audioNodes.push(hs);
+        }
+
+        // ═══ ELECTRIC BORDER ENGINE ═══
+
+        // ═══ TALK BREAK ═══
+        let talkHistory=[],talkOffline=false;
+        const talkPrompts={roast:"You are a brutally funny but loving study coach. Roast this student into getting back to studying in 3-4 sentences. Be harsh but hilarious and end with real motivation. Max 80 words.",commander:"You are a drill sergeant motivating a student to study. Give 3-4 short punchy commands with military energy. End with something genuinely inspiring. Max 80 words.",genius:"Talk to a brilliant student who is clearly slacking. Acknowledge their genius but call them out for wasting it. Challenge them. Max 80 words.",therapy:"You are a calm warm therapist. Help this student release study anxiety with one grounding technique and one positive reframe. Max 80 words.",truth:"Give this student ONE harsh uncomfortable truth about procrastination they need to hear right now. Make it land. Max 60 words.",story:"Tell a 4-sentence micro story about a student who almost gave up but pushed through and succeeded. Make it emotional.",debate:"Pick a fun debate topic and take a strong stance. Challenge the student to argue back. Max 70 words.",questions:"Ask 3 deep thought-provoking questions about the student's goals, values, or future. Number them. Don't answer them."};
+        const talkOfflineReplies={roast:"You clicked 'Roast me' instead of opening your notes — that IS the roast. Now close this and study. You've got this! 🔥",commander:"ATTENTION! Drop the distractions! You have goals to crush! Every second you waste is ground you give away! NOW MOVE! 🎖️",genius:"You're clearly brilliant enough to be stressed about this. A slacking genius is still a genius — but imagine what a focused genius can do. 🧠",therapy:"Take a breath. In for 4... hold... out for 4. You're here, you're trying, and that already makes you ahead of the person who quit. 💙",truth:"Every time you avoid studying, future-you pays the price. That version of you is going to be really disappointed. Or really proud. That's entirely up to present-you. 💀",story:"She almost closed her laptop. One more hour felt impossible. But she opened one page — just one. Three hours later, she'd covered everything. It always starts with just one page. 📖",debate:"Hot take: studying in short focused bursts beats marathon sessions every time. Fight me. Or better yet — prove it by going back to study after this. ⚔️",questions:"1. What would you do with your life if you knew you couldn't fail?\n2. Are you studying for a grade, or for the person you want to become?\n3. What does the best version of you look like one year from now? 🔮"};
+        function resetTalkChat() { talkHistory=[]; document.getElementById('talk-chat-area').style.display='none'; document.getElementById('talk-input-wrap').style.display='none'; document.getElementById('talk-chat-area').innerHTML=''; }
+        async function startTalkMode(mode) {
+            const chat=document.getElementById('talk-chat-area'); chat.style.display='block'; document.getElementById('talk-input-wrap').style.display='flex';
+            talkHistory=[{role:'user',content:'Start the session.'}];
+            const typing=document.createElement('div'); typing.className='bubble'; typing.innerHTML='<div class="ai-label">🤖 Empath AI</div><div class="typing-dots"><span></span><span></span><span></span></div>'; chat.appendChild(typing); chat.scrollTop=chat.scrollHeight;
+            try {
+                const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:talkPrompts[mode],messages:talkHistory})});
+                const d=await r.json(); typing.remove(); const reply=d.content?.[0]?.text||talkOfflineReplies[mode]; talkHistory.push({role:'assistant',content:reply});
+                const b=document.createElement('div'); b.className='bubble'; b.innerHTML=`<div class="ai-label">🤖 Empath AI</div>${reply.replace(/\n/g,'<br>')}`; chat.appendChild(b); chat.scrollTop=chat.scrollHeight;
+            } catch(e) { typing.remove(); const b=document.createElement('div'); b.className='bubble'; b.innerHTML=`<div class="ai-label">🤖 Empath AI</div>${talkOfflineReplies[mode].replace(/\n/g,'<br>')}`; chat.appendChild(b); chat.scrollTop=chat.scrollHeight; }
+        }
+        async function sendTalkReply() {
+            const input=document.getElementById('talk-chat-input'); const msg=input.value.trim(); if(!msg) return; input.value='';
+            const chat=document.getElementById('talk-chat-area'); const ub=document.createElement('div'); ub.className='bubble user-bubble'; ub.textContent=msg; chat.appendChild(ub); chat.scrollTop=chat.scrollHeight;
+            talkHistory.push({role:'user',content:msg});
+            const typing=document.createElement('div'); typing.className='bubble'; typing.innerHTML='<div class="ai-label">🤖 Empath AI</div><div class="typing-dots"><span></span><span></span><span></span></div>'; chat.appendChild(typing); chat.scrollTop=chat.scrollHeight;
+            try { const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:"You are Empath AI, a warm sharp study companion. Keep replies short (max 60 words), engaging and helpful.",messages:talkHistory})}); const d=await r.json(); typing.remove(); const reply=d.content?.[0]?.text||'Keep going — you\'re doing great! 💪'; talkHistory.push({role:'assistant',content:reply}); const b=document.createElement('div'); b.className='bubble'; b.innerHTML=`<div class="ai-label">🤖 Empath AI</div>${reply.replace(/\n/g,'<br>')}`; chat.appendChild(b); chat.scrollTop=chat.scrollHeight; }
+            catch(e) { typing.remove(); const b=document.createElement('div'); b.className='bubble'; b.innerHTML=`<div class="ai-label">🤖 Empath AI</div>Keep going — you've got this! 💪`; chat.appendChild(b); }
+        }
+
+        // ═══ RELAX BREAK ═══
+        let breathInterval=null,stretchInterval=null,eyeInterval=null,medTimer=null;
+        function resetRelax() { ['breath','sound','stretch','eyes','meditation'].forEach(m=>{const el=document.getElementById('relax-'+m);if(el)el.style.display='none'}); document.getElementById('relax-active').style.display='none'; stopAudio(); breakSecondsLeft=300;breakTotalSeconds=300;updateBreakDisplay(); const ring=document.getElementById('timer-ring');if(ring)ring.style.strokeDashoffset=0; const prog=document.getElementById('break-progress');if(prog)prog.style.width='100%'; }
+        function showRelaxModule(name) { document.getElementById('relax-active').style.display='flex'; document.getElementById('relax-active').style.flexDirection='column'; document.getElementById('relax-active').style.alignItems='center'; ['breath','sound','stretch','eyes','meditation'].forEach(m=>{const el=document.getElementById('relax-'+m);if(el)el.style.display='none'}); const t=document.getElementById('relax-'+name);if(t)t.style.display='flex'; startBreakTimer(); }
+        function startRelax(type) {
+            resetRelax(); clearInterval(breathInterval); clearInterval(stretchInterval); clearInterval(eyeInterval); clearTimeout(medTimer);
+            if(type==='breath'){showRelaxModule('breath');startBreathing();}
+            else if(type==='music'){ showRelaxModule('sound'); document.getElementById('sound-icon').textContent='🎵'; document.getElementById('sound-label').textContent='Lo-fi Focus Music'; document.getElementById('sound-sub').textContent='Full-screen player · scrolling blocked'; document.getElementById('lofi-open-btn').onclick=()=>openLofiOverlay('lofi'); }
+            else if(type==='rain'){  showRelaxModule('sound'); document.getElementById('sound-icon').textContent='🌧️'; document.getElementById('sound-label').textContent='Rain & Brown Noise'; document.getElementById('sound-sub').textContent='Full-screen player · scrolling blocked'; document.getElementById('lofi-open-btn').onclick=()=>openLofiOverlay('rain'); }
+            else if(type==='stretch'){showRelaxModule('stretch');startStretches();}
+            else if(type==='eyes'){showRelaxModule('eyes');startEyeExercise();}
+            else if(type==='meditation'){showRelaxModule('meditation');startMeditation();}
+        }
+        const breathPhases=[{label:'Inhale',count:4,text:'Breathe in slowly through your nose...'},{label:'Hold',count:7,text:'Hold your breath gently...'},{label:'Exhale',count:8,text:'Breathe out slowly through your mouth...'}];
+        let breathPhaseIdx=0,breathCountLeft=4;
+        function startBreathing(){breathPhaseIdx=0;breathCountLeft=4;updateBreathUI();breathInterval=setInterval(()=>{breathCountLeft--;if(breathCountLeft<=0){breathPhaseIdx=(breathPhaseIdx+1)%3;breathCountLeft=breathPhases[breathPhaseIdx].count;}updateBreathUI();},1000);}
+        function updateBreathUI(){const ph=breathPhases[breathPhaseIdx];document.getElementById('breath-label').textContent=ph.label;document.getElementById('breath-count').textContent=breathCountLeft;document.getElementById('breath-phase-text').textContent=ph.text;const circ=document.getElementById('breath-circle');circ.style.transform=ph.label==='Exhale'?'scale(1)':'scale(1.2)';}
+        const stretches=[{ic:'🙆',name:'Neck Roll',desc:'Slowly roll your head in a full circle. 5 times each direction.'},{ic:'🤸',name:'Shoulder Shrug',desc:'Raise shoulders to ears, hold 3 seconds, drop. Repeat 8 times.'},{ic:'🙏',name:'Wrist Circles',desc:'Extend arms, rotate wrists in circles. 10 times each direction.'},{ic:'🧘',name:'Seated Twist',desc:'Sit tall, twist gently right 15s, then left. Great for your spine.'},{ic:'👀',name:'Eye Roll',desc:'Close eyes, roll them slowly in a full circle 5 times.'},{ic:'🤲',name:'Hand Stretch',desc:'Spread fingers wide, hold 10s, make a fist. Repeat 5 times.'}];
+        let stretchIdx=0,stretchSecLeft=30;
+        function startStretches(){stretchIdx=0;showStretch();}
+        function showStretch(){const s=stretches[stretchIdx];document.getElementById('stretch-ic').textContent=s.ic;document.getElementById('stretch-name').textContent=s.name;document.getElementById('stretch-desc').textContent=s.desc;stretchSecLeft=30;updateStretchTimer();clearInterval(stretchInterval);stretchInterval=setInterval(()=>{stretchSecLeft--;updateStretchTimer();if(stretchSecLeft<=0){clearInterval(stretchInterval);if(stretchIdx<stretches.length-1){stretchIdx++;showStretch();}}},1000);}
+        function updateStretchTimer(){document.getElementById('stretch-time').textContent=`0:${stretchSecLeft.toString().padStart(2,'0')}`;}
+        function nextStretch(){clearInterval(stretchInterval);stretchIdx=(stretchIdx+1)%stretches.length;showStretch();}
+        let eyeSecLeft=20,eyePhase=0;
+        const eyePhases=[{text:'Look at something 20 feet away...',sec:20},{text:'Blink slowly 10 times 👁️',sec:15},{text:'Close your eyes and rest 🌙',sec:20},{text:'Gently massage your eyelids 🤲',sec:15}];
+        function startEyeExercise(){eyePhase=0;runEyePhase();}
+        function runEyePhase(){if(eyePhase>=eyePhases.length)eyePhase=0;const ph=eyePhases[eyePhase];eyeSecLeft=ph.sec;document.getElementById('eye-instruction').textContent=ph.text;clearInterval(eyeInterval);eyeInterval=setInterval(()=>{eyeSecLeft--;document.getElementById('eye-time').textContent=`0:${eyeSecLeft.toString().padStart(2,'0')}`;if(eyeSecLeft<=0){clearInterval(eyeInterval);eyePhase++;runEyePhase();}},1000);}
+        const medScripts=["Close your eyes. Feel the weight of your body in your chair. You are grounded and present. 🌙","Breathe in deeply. With each breath, let go of what you cannot control right now. You are safe. 💙","Your mind works hard every day. Give it permission to rest for just this moment. You are enough. ✨","Picture yourself succeeding — calm, capable, and confident. That version of you is real. 🌟","You showed up today. That matters more than you know. Be gentle with yourself. 🤍"];
+        let medIdx=0;
+        function startMeditation(){medIdx=0;showMedLine();}
+        function showMedLine(){if(medIdx>=medScripts.length)medIdx=0;document.getElementById('med-text').textContent=medScripts[medIdx];clearTimeout(medTimer);medTimer=setTimeout(()=>{medIdx++;showMedLine();},4500);}
+
+        // ═══ STUDY MODE CONFIG ═══
+        const modeConfig = {
+            revenge: { label: '⚔️ Revenge Mode', theme: 'revenge', title: "Revenge Mode — Let's dominate.", tagline: 'Timer-based challenges. Every minute counts against the competition.', task: '⚡ Task: Complete 3 timed problem sets. Beat your best score.', tip: "🔥 Close the gap. You've been here before — and you've come back stronger.", badge: 'revenge', challenge: true, pomodoro: 25 * 60 },
+            lazy: { label: '🛋️ Lazy Mode', theme: 'lazy', title: 'Lazy Mode — Easy does it.', tagline: 'Short bursts, zero pressure. 10 minutes on, 5 off.', task: '📖 Task: Read one section at a comfortable pace. No rush at all.', tip: "🌙 Even 10 focused minutes beats zero. You're doing great by being here.", badge: 'lazy', challenge: false, pomodoro: 10 * 60 },
+            stress: { label: '😰 Stress Mode', theme: 'stress', title: "Stress Mode — Breathe. You've got this.", tagline: 'Prioritised tasks, calm interface. Focus on what matters most.', task: '📋 Task: Write down your top 3 unsure topics. Tackle the first one now.', tip: "💙 Stress means you care. Channel it — you're more prepared than you think.", badge: 'stress', challenge: false, pomodoro: 20 * 60 },
+            happy: { label: '😊 Happy Mode', theme: 'happy', title: "Happy Mode — Let's fly! ✨", tagline: 'Balanced, productive, and positively charged.', task: '🎯 Task: Cover your planned topic for today with full focus.', tip: "🌟 Great mindset = great results. You're already winning today.", badge: 'happy', challenge: false, pomodoro: 25 * 60 }
+        };
+
+        function selectStudyMode(mode, cardEl) {
+            studyMode = mode; const cfg = modeConfig[mode];
+            const card = cardEl && cardEl.classList ? cardEl : (cardEl && cardEl.target ? cardEl.target.closest('.study-mode-card') : null);
+            document.querySelectorAll('.study-mode-card').forEach(c => {
+                if (c !== card) { c.style.opacity = '0.25'; c.style.transform = 'scale(0.95)'; }
+                else { c.style.transform = 'scale(1.08)'; }
+            });
+            setTimeout(() => {
+                document.querySelectorAll('.study-mode-card').forEach(c => { c.style.opacity = ''; c.style.transform = ''; });
+                setTheme(cfg.theme); document.getElementById('study-mode-badge').textContent = cfg.label;
+                document.getElementById('study-mode-title').textContent = cfg.title; document.getElementById('study-mode-tagline').textContent = cfg.tagline;
+                document.getElementById('focus-task-text').textContent = cfg.task; document.getElementById('ai-tip-text').textContent = cfg.tip;
+                document.getElementById('challenge-widget').style.display = cfg.challenge ? 'block' : 'none';
+                studySecondsLeft = cfg.pomodoro; studyPaused = false; clearInterval(studyTimerInterval); studyTimerInterval = null; updateStudyTimerDisplay();
+                studyChatHistory = []; const chat = document.getElementById('study-chat'); chat.innerHTML = '';
+                setTimeout(() => { addAIBubble(chat, `Got it! Adapting your session for <strong>${cfg.label}</strong>. Ask me anything — I'm here to help you study smarter. 💪`); }, 300);
+                const myScoreEl = document.getElementById('my-score'), frScoreEl = document.getElementById('friend-score');
+                const my = myScoreEl ? myScoreEl.value : '', fr = frScoreEl ? frScoreEl.value : '';
+                if (my) document.getElementById('sidebar-my-score').textContent = my;
+                if (fr) document.getElementById('sidebar-friend-score').textContent = fr;
+                goTo('screen-study');
+            }, 480);
+        }
+
+        // ═══ AI CHATBOT ═══
+        const OFFLINE_TOPICS = { photosynthesis: 'Photosynthesis is the process by which green plants make their own food using <strong>sunlight</strong>, <strong>water</strong>, and <strong>carbon dioxide</strong> to produce glucose and oxygen. Equation: 6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂.', mitosis: 'Mitosis: cell division producing two identical daughter cells. Stages: <strong>Prophase</strong> → <strong>Metaphase</strong> → <strong>Anaphase</strong> → <strong>Telophase</strong>. Used for growth and repair.', 'quadratic equation': 'Quadratic: ax² + bx + c = 0. Formula: x = (−b ± √(b²−4ac)) / 2a. Discriminant tells roots count.', pythagorean: 'Pythagorean theorem: a² + b² = c². Example: 3² + 4² = 25, so c = 5.' };
+        function getOfflineReply(msg) { const l = msg.toLowerCase(); for (const [k, t] of Object.entries(OFFLINE_TOPICS)) { if (l.includes(k)) return t } return "I'm in offline mode. Try asking about: photosynthesis, mitosis, quadratic equations, or the Pythagorean theorem." }
+
+        function addAIBubble(container, html, isTyping = false) { const b = document.createElement('div'); b.className = 'bubble' + (isTyping ? ' typing-bubble' : ''); b.innerHTML = `<div class="ai-label">🤖 Empath AI</div>${html}`; container.appendChild(b); container.scrollTop = container.scrollHeight; return b }
+        function addUserBubble(container, text) { const b = document.createElement('div'); b.className = 'bubble user-bubble'; b.textContent = text; container.appendChild(b); container.scrollTop = container.scrollHeight }
+
+        async function sendStudyChat() {
+            const input = document.getElementById('study-chat-input'), msg = input.value.trim(); if (!msg) return; input.value = '';
+            const chat = document.getElementById('study-chat'); addUserBubble(chat, msg); studyChatHistory.push({ role: 'user', content: msg });
+            const typingBubble = addAIBubble(chat, '<div class="typing-dots"><span></span><span></span><span></span></div>', true);
+            try {
+                const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: msg, emotion: currentEmotion, mode: studyMode }) });
+                const d = await r.json(); if (!r.ok && d.fallback) throw new Error('API unavailable');
+                const reply = d.text || 'I had trouble responding. Try again!'; offlineModeActive = false; typingBubble.remove();
+                addAIBubble(chat, reply.replace(/\n/g, '<br>')); studyChatHistory.push({ role: 'assistant', content: reply });
+            } catch (err) {
+                typingBubble.remove(); if (!offlineModeActive) { offlineModeActive = true; addAIBubble(chat, 'Internet seems unstable. Switching to <strong>offline study mode</strong>. 📴') }
+                const rep = getOfflineReply(msg); addAIBubble(chat, rep); studyChatHistory.push({ role: 'assistant', content: rep });
+            }
+        }
+
+        // ═══ STUDY TIMER ═══
+        function updateStudyTimerDisplay() { const m = Math.floor(studySecondsLeft / 60), s = studySecondsLeft % 60; document.getElementById('study-timer-display').textContent = `${m}:${s.toString().padStart(2, '0')}` }
+        function startStudyTimer() { if (studyTimerInterval) return; const total = modeConfig[studyMode].pomodoro; studyTimerInterval = setInterval(() => { if (studyPaused) return; if (studySecondsLeft <= 0) { clearInterval(studyTimerInterval); studyTimerInterval = null; sessionsCompleted++; document.getElementById('sessions-done').textContent = `${sessionsCompleted} session${sessionsCompleted > 1 ? 's' : ''} completed`; const pct = Math.min(sessionsCompleted * 25, 100); document.getElementById('study-progress-fill').style.width = pct + '%'; document.getElementById('progress-pct').textContent = pct + '%'; addAIBubble(document.getElementById('study-chat'), "Session complete! 🎉 Take a 5-minute break, then we'll go again. You're crushing it!"); studySecondsLeft = modeConfig[studyMode].pomodoro; document.getElementById('study-timer-ring').style.strokeDashoffset = 0; updateStudyTimerDisplay(); return } studySecondsLeft--; updateStudyTimerDisplay(); document.getElementById('study-timer-ring').style.strokeDashoffset = 295 * (1 - studySecondsLeft / total) }, 1000) }
+        function togglePause() { studyPaused = !studyPaused }
+        function finishStudy() { clearInterval(studyTimerInterval); studyTimerInterval = null; setTheme(null); goTo('screen-post') }
+
+        function postEmoji(btn, feeling) {
+            document.querySelectorAll('#post-emoji-row .emoji-btn').forEach(b => { b.classList.remove('selected', 'faded'); if (b !== btn) b.classList.add('faded') }); btn.classList.add('selected');
+            const msgs = { great: "That's amazing! 🌟 Your consistency is going to pay off in a huge way.", okay: "Progress is progress 💪 Every session builds the foundation.", tired: "Rest well — you earned it 🌙 You still showed up, and that's everything.", stressed: "Hey, stress means you care deeply. Tomorrow will feel lighter 💙" };
+            setTimeout(() => { addAIBubble(document.getElementById('post-chat'), msgs[feeling]) }, 300);
+        }
+
+        // ═══ ELECTRIC BORDER ENGINE ═══
+        (function initElectricBorders() {
+            function rand(x) { return ((Math.sin(x * 12.9898) * 43758.5453) % 1 + 1) % 1 - 0.5; }
+            function noise2D(x, y) {
+                const i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j;
+                const a = rand(i + j * 57), b = rand(i + 1 + j * 57), c = rand(i + (j + 1) * 57), d = rand(i + 1 + (j + 1) * 57);
+                const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
+                return a * (1 - ux) * (1 - uy) + b * ux * (1 - uy) + c * (1 - ux) * uy + d * ux * uy;
+            }
+            function octNoise(x, t, seed, amplitude, chaos) {
+                let y = 0, amp = amplitude, freq = 10, lac = 1.6, gain = 0.7;
+                for (let i = 0; i < 10; i++) { y += amp * noise2D(freq * x + seed * 100, t * freq * 0.3); freq *= lac; amp *= gain; }
+                return y;
+            }
+            function getCorner(cx, cy, r, startA, arcLen, p) {
+                const a = startA + p * arcLen;
+                return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+            }
+            function getRectPoint(t, l, top, w, h, r) {
+                const sw = w - 2 * r, sh = h - 2 * r, ca = Math.PI * r / 2;
+                const perim = 2 * sw + 2 * sh + 4 * ca;
+                let d = t * perim, acc = 0;
+                if (d <= acc + sw) { const p = (d - acc) / sw; return { x: l + r + p * sw, y: top }; } acc += sw;
+                if (d <= acc + ca) { return getCorner(l + w - r, top + r, r, -Math.PI / 2, Math.PI / 2, (d - acc) / ca); } acc += ca;
+                if (d <= acc + sh) { const p = (d - acc) / sh; return { x: l + w, y: top + r + p * sh }; } acc += sh;
+                if (d <= acc + ca) { return getCorner(l + w - r, top + h - r, r, 0, Math.PI / 2, (d - acc) / ca); } acc += ca;
+                if (d <= acc + sw) { const p = (d - acc) / sw; return { x: l + w - r - p * sw, y: top + h }; } acc += sw;
+                if (d <= acc + ca) { return getCorner(l + r, top + h - r, r, Math.PI / 2, Math.PI / 2, (d - acc) / ca); } acc += ca;
+                if (d <= acc + sh) { const p = (d - acc) / sh; return { x: l, y: top + h - r - p * sh }; } acc += sh;
+                return getCorner(l + r, top + r, r, Math.PI, Math.PI / 2, (d - acc) / ca);
+            }
+
+            function setupCard(card) {
+                const canvas = card.querySelector('.electric-canvas');
+                if (!canvas) return;
+                const color = card.dataset.electricColor || '#ffffff';
+                const chaos = parseFloat(card.dataset.electricChaos) || 0.12;
+                const speed = parseFloat(card.dataset.electricSpeed) || 1;
+                const borderOffset = 28, borderRadius = 18, displacement = 36;
+                let time = 0, lastTime = 0, animId = null, running = false;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const ctx = canvas.getContext('2d');
+
+                function resize() {
+                    const rect = card.getBoundingClientRect();
+                    const W = rect.width + borderOffset * 2, H = rect.height + borderOffset * 2;
+                    canvas.width = W * dpr; canvas.height = H * dpr;
+                    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+                }
+
+                function draw(now) {
+                    const dt = (now - lastTime) / 1000; time += dt * speed; lastTime = now;
+                    const W = canvas.width / dpr, H = canvas.height / dpr;
+                    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.scale(dpr, dpr);
+                    const l = borderOffset, top = borderOffset, bw = W - 2 * borderOffset, bh = H - 2 * borderOffset;
+                    const r = Math.min(borderRadius, Math.min(bw, bh) / 2);
+                    const perim = 2 * (bw + bh) + 2 * Math.PI * r, samples = Math.floor(perim / 2);
+                    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                    ctx.shadowColor = color; ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    for (let i = 0; i <= samples; i++) {
+                        const prog = i / samples;
+                        const pt = getRectPoint(prog, l, top, bw, bh, r);
+                        const dx = octNoise(prog * 8, time, 0, chaos, chaos) * displacement;
+                        const dy = octNoise(prog * 8, time, 1, chaos, chaos) * displacement;
+                        if (i === 0) ctx.moveTo(pt.x + dx, pt.y + dy); else ctx.lineTo(pt.x + dx, pt.y + dy);
+                    }
+                    ctx.closePath(); ctx.stroke();
+                    if (running) animId = requestAnimationFrame(draw);
+                }
+
+                function start() { if (running) return; running = true; resize(); lastTime = performance.now(); animId = requestAnimationFrame(draw); }
+                function stop() { running = false; if (animId) { cancelAnimationFrame(animId); animId = null; } ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+                card.addEventListener('mouseenter', start);
+                card.addEventListener('mouseleave', stop);
+                resize();
+                new ResizeObserver(resize).observe(card);
+            }
+
+            function init() {
+                document.querySelectorAll('.study-mode-card[data-electric-color]').forEach(setupCard);
+            }
+
+            // Init on DOMContentLoaded or now if already loaded
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            else init();
+        })();
+    </script>
+</body>
+
+</html>
