@@ -25,8 +25,8 @@ Once you feel better, you are guided back to Study Mode.
 📚 Study Modes
 
 We provide four different modes tailored to your mindset:
-⚔️ Revenge Mode — Beat your rival
-😴 Lazy Mode — Start slow when exams are far away
-😊 Normal / Happy Mode — Balanced studying
-😰 Stress Mode — High-focus, urgency-driven
+⚔️ Revenge Mode - Beat your rival
+😴 Lazy Mode - Start slow when exams are far away
+😊 Normal / Happy Mode - Balanced studying
+😰 Stress Mode - High-focus, urgency-driven
 
