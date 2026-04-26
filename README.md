@@ -11,7 +11,7 @@ Analyze your face <br>
 Detect your emotions <br>
 
 If you’re feeling low, stressed, or just off, the app takes you to a wellness corner. <br> 
-In the wellness corner, you can:
+In the wellness corner, you can: <br> 
 🎵 Lo-fi music <br>
 👀 20-20-20 rule <br>
 🌬️ 4-7-8 breathing <br>
